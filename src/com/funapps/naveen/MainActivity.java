@@ -1,5 +1,6 @@
 package com.funapps.naveen;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -8,44 +9,62 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainActivity extends Activity {
-	LocationService locationService;
-	Button gps, nwt;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 
-	@Override
+public class MainActivity extends Activity {
+	FusedLocationService fusedLocationService;
+	Button gps,nwt;
+	TextView tvLocation;
+	LocationService locationService;
+	@SuppressLint("NewApi") @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		if(!isGooglePlayServicesAvailable()){
+			finish();
+		}
+		fusedLocationService = new FusedLocationService(MainActivity.this);
+		locationService = new LocationService(MainActivity.this);
 		setContentView(R.layout.activity_main);
 		gps = (Button) findViewById(R.id.btgps);
 		nwt = (Button) findViewById(R.id.btnwt);
-		locationService = new LocationService(MainActivity.this);
-
+		tvLocation =(TextView) findViewById(R.id.tvLocation);
 		gps.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				Location gpsLocation = locationService
-						.getLocation(LocationManager.GPS_PROVIDER);
-				if(gpsLocation!=null){
-					double latitude = gpsLocation.getLatitude();
-					double longitude = gpsLocation.getLongitude();
-					Toast.makeText(
-							getApplicationContext(),
-							"Mobile Location (GPS): \nLatitude: " + latitude
-									+ "\nLongitude: " + longitude,
-							Toast.LENGTH_LONG).show();
-				}
-				else{
-					showSettingsAlert("GPS");
-				}
+				Location location = fusedLocationService
+						.getLocation();
+				String locationResult = "";
+                if (null != location) {
+                    Log.i("TAG", location.toString());
+                    double latitude = location.getLatitude();
+                    double longitude = location.getLongitude();
+                    float accuracy = location.getAccuracy();
+                    double elapsedTimeSecs = (double) location.getElapsedRealtimeNanos()
+                            / 1000000000.0;
+                    String provider = location.getProvider();
+                    double altitude = location.getAltitude();
+                    locationResult = "Latitude: " + latitude + "\n" +
+                            "Longitude: " + longitude + "\n" +
+                            "Altitude: " + altitude + "\n" +
+                            "Accuracy: " + accuracy + "\n" +
+                            "Elapsed Time: " + elapsedTimeSecs + " secs" + "\n" +
+                            "Provider: " + provider + "\n";
+                } else {
+                    locationResult = "Location Not Available!";
+                }
+                tvLocation.setText(locationResult);
 			}
 		});
 		
@@ -70,7 +89,15 @@ public class MainActivity extends Activity {
 			}
 		});
 	}
-
+	private boolean isGooglePlayServicesAvailable() {
+        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+        if (ConnectionResult.SUCCESS == status) {
+            return true;
+        } else {
+            GooglePlayServicesUtil.getErrorDialog(status, this, 0).show();
+            return false;
+        }
+    }
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
