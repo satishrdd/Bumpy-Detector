@@ -1648,10 +1648,12 @@ containing a value of this type.
         public static final int action_mode_bar=0x7f09002e;
         public static final int action_mode_bar_stub=0x7f09002d;
         public static final int action_mode_close_button=0x7f090020;
-        public static final int action_settings=0x7f09003f;
+        public static final int action_settings=0x7f090041;
         public static final int activity_chooser_view_content=0x7f090021;
         public static final int always=0x7f090014;
         public static final int beginning=0x7f09001b;
+        public static final int btgps=0x7f09003f;
+        public static final int btnwt=0x7f090040;
         public static final int checkbox=0x7f090029;
         public static final int collapseActionView=0x7f090015;
         public static final int decor_content_parent=0x7f09002f;
