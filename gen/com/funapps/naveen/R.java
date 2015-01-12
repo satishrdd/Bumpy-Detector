@@ -2030,7 +2030,7 @@ containing a value of this type.
         public static final int action_mode_bar=0x7f0b003f;
         public static final int action_mode_bar_stub=0x7f0b003e;
         public static final int action_mode_close_button=0x7f0b0031;
-        public static final int action_settings=0x7f0b0052;
+        public static final int action_settings=0x7f0b0055;
         public static final int activity_chooser_view_content=0x7f0b0032;
         public static final int always=0x7f0b0025;
         public static final int beginning=0x7f0b002c;
@@ -2100,6 +2100,9 @@ containing a value of this type.
         public static final int useLogo=0x7f0b0024;
         public static final int withText=0x7f0b0029;
         public static final int wrap_content=0x7f0b0016;
+        public static final int x_axis=0x7f0b0052;
+        public static final int y_axis=0x7f0b0053;
+        public static final int z_axis=0x7f0b0054;
     }
     public static final class integer {
         /**  The maximum number of action buttons that should be permitted within
@@ -2152,7 +2155,8 @@ containing a value of this type.
         public static final int abc_search_view=0x7f030015;
         public static final int abc_simple_dropdown_hint=0x7f030016;
         public static final int activity_main=0x7f030017;
-        public static final int support_simple_spinner_dropdown_item=0x7f030018;
+        public static final int sensor=0x7f030018;
+        public static final int support_simple_spinner_dropdown_item=0x7f030019;
     }
     public static final class menu {
         public static final int main=0x7f0c0000;

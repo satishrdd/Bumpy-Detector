@@ -438,7 +438,7 @@ int id action_menu_presenter 0x7f0b0006
 int id action_mode_bar 0x7f0b003f
 int id action_mode_bar_stub 0x7f0b003e
 int id action_mode_close_button 0x7f0b0031
-int id action_settings 0x7f0b0052
+int id action_settings 0x7f0b0055
 int id activity_chooser_view_content 0x7f0b0032
 int id always 0x7f0b0025
 int id beginning 0x7f0b002c
@@ -508,6 +508,9 @@ int id up 0x7f0b0001
 int id useLogo 0x7f0b0024
 int id withText 0x7f0b0029
 int id wrap_content 0x7f0b0016
+int id x_axis 0x7f0b0052
+int id y_axis 0x7f0b0053
+int id z_axis 0x7f0b0054
 int integer abc_max_action_buttons 0x7f080001
 int integer google_play_services_version 0x7f080000
 int layout abc_action_bar_title_item 0x7f030000
@@ -534,7 +537,8 @@ int layout abc_search_dropdown_item_icons_2line 0x7f030014
 int layout abc_search_view 0x7f030015
 int layout abc_simple_dropdown_hint 0x7f030016
 int layout activity_main 0x7f030017
-int layout support_simple_spinner_dropdown_item 0x7f030018
+int layout sensor 0x7f030018
+int layout support_simple_spinner_dropdown_item 0x7f030019
 int menu main 0x7f0c0000
 int string abc_action_bar_home_description 0x7f060024
 int string abc_action_bar_home_description_format 0x7f060028
