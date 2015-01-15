@@ -30,14 +30,16 @@ import com.google.android.gms.maps.model.PolylineOptions;
 
 public class BumpyLocation extends FragmentActivity implements
 		LocationListener, SensorEventListener {
-	TextView tvLocation;
+	TextView x_acc, y_acc, z_acc;
 	LocationService locationService;
-	GoogleMap googleMap;
+	// GoogleMap googleMap;
 	LatLng latlong, prevlatlong = null;
 	private float mLastX, mLastY, mLastZ;
 	private boolean mInitialized;
 	private SensorManager mSensorManager;
 	private Sensor mAccelerometer;
+	FileOperations fileOperations;
+	final String filename = "location";
 	private final float NOISE = (float) 2.0;
 
 	@SuppressLint("NewApi")
@@ -47,8 +49,15 @@ public class BumpyLocation extends FragmentActivity implements
 		if (!isGooglePlayServicesAvailable()) {
 			finish();
 		}
-		setContentView(R.layout.activity_main);
-		tvLocation = (TextView) findViewById(R.id.tvLocation);
+		setContentView(R.layout.bumpylocation);
+		fileOperations = new FileOperations();
+		// tvLocation = (TextView) findViewById(R.id.tvLocation);
+		x_acc = (TextView) findViewById(R.id.x_acc);
+		y_acc = (TextView) findViewById(R.id.y_acc);
+		z_acc = (TextView) findViewById(R.id.z_acc);
+		x_acc.setText("");
+		y_acc.setText("");
+		z_acc.setText("");
 		mInitialized = false;
 		mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 		mAccelerometer = mSensorManager
@@ -56,10 +65,11 @@ public class BumpyLocation extends FragmentActivity implements
 		mSensorManager.registerListener(this, mAccelerometer,
 				SensorManager.SENSOR_DELAY_NORMAL);
 
-		SupportMapFragment supportMapFragment = (SupportMapFragment) getSupportFragmentManager()
-				.findFragmentById(R.id.googleMap);
-		googleMap = supportMapFragment.getMap();
-		googleMap.setMyLocationEnabled(true);
+		// SupportMapFragment supportMapFragment = (SupportMapFragment)
+		// getSupportFragmentManager()
+		// .findFragmentById(R.id.googleMap);
+		// googleMap = supportMapFragment.getMap();
+		// googleMap.setMyLocationEnabled(true);
 
 		LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 		Criteria criteria = new Criteria();
@@ -70,7 +80,7 @@ public class BumpyLocation extends FragmentActivity implements
 			onLocationChanged(location);
 		}
 
-		locationManager.requestLocationUpdates(bestProvider, 20000, 0, this);
+		locationManager.requestLocationUpdates(bestProvider, 5000, 0, this);
 
 		// gps = (Button) findViewById(R.id.btgps);
 		// nwt = (Button) findViewById(R.id.btnwt);
@@ -190,11 +200,13 @@ public class BumpyLocation extends FragmentActivity implements
 
 		latlong = new LatLng(latitude, longitude);
 
-		googleMap.addMarker(new MarkerOptions().position(latlong));
-		googleMap.moveCamera(CameraUpdateFactory.newLatLng(latlong));
-		googleMap.animateCamera(CameraUpdateFactory.zoomTo(15));
-		tvLocation.setText("Latitude: " + latitude + "\n" + "Longitude: "
-				+ longitude);
+		// googleMap.addMarker(new MarkerOptions().position(latlong));
+		// googleMap.moveCamera(CameraUpdateFactory.newLatLng(latlong));
+		// googleMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+		// tvLocation.setText("Latitude: " + latitude + "\n" + "Longitude: "
+		// + longitude);
+		//
+
 	}
 
 	@Override
@@ -243,24 +255,31 @@ public class BumpyLocation extends FragmentActivity implements
 			mLastY = y;
 			mLastZ = z;
 			// edited here
-			if (deltaZ > 1.5) {
-				CircleOptions circleOptions = new CircleOptions();
-				circleOptions.center(latlong);
-				circleOptions.radius(5);
-				circleOptions.strokeColor(Color.YELLOW);
-				circleOptions.strokeWidth(5);
-				circleOptions.fillColor(Color.GREEN);
-				googleMap.addCircle(circleOptions);
-				if (prevlatlong != null && latlong != prevlatlong)
-					googleMap.addPolyline(new PolylineOptions().add(latlong,
-							prevlatlong));
-				prevlatlong = latlong;
+			if (deltaZ > 10) {
+				// CircleOptions circleOptions = new CircleOptions();
+				// circleOptions.center(latlong);
+				// circleOptions.radius(5);
+				// circleOptions.strokeColor(Color.YELLOW);
+				// circleOptions.strokeWidth(5);
+				// circleOptions.fillColor(Color.GREEN);
+				// googleMap.addCircle(circleOptions);
+				// if (prevlatlong != null && latlong != prevlatlong)
+				// googleMap.addPolyline(new PolylineOptions().add(latlong,
+				// prevlatlong));
 
+				if (prevlatlong != null && latlong != prevlatlong) {
+					String write = latlong.latitude + " " + latlong.longitude;
+					fileOperations.write(filename, write);
+				}
+				prevlatlong = latlong;
+				x_acc.setText(x_acc.getText().toString() + "\n"
+						+ Float.toString(deltaX));
+				y_acc.setText(y_acc.getText().toString() + "\n"
+						+ Float.toString(deltaY));
+				z_acc.setText(z_acc.getText().toString() + "\n"
+						+ Float.toString(deltaZ));
 			}
 
-			// tvX.setText(Float.toString(deltaX));
-			// tvY.setText(Float.toString(deltaY));
-			// tvZ.setText(Float.toString(deltaZ));
 			// iv.setVisibility(View.VISIBLE);
 			if (deltaX > deltaY) {
 				// iv.setImageResource(R.drawable.horizontal);
@@ -274,14 +293,14 @@ public class BumpyLocation extends FragmentActivity implements
 
 	protected void onResume() {
 		super.onResume();
-		mSensorManager.registerListener(this, mAccelerometer,
-				SensorManager.SENSOR_DELAY_NORMAL);
+	//	mSensorManager.registerListener(this, mAccelerometer,
+	//			SensorManager.SENSOR_DELAY_NORMAL);
 	}
 
 	protected void onPause() {
 		super.onPause();
 		Log.d("Paused", "event paused");
-		mSensorManager.unregisterListener(this);
+	//	mSensorManager.unregisterListener(this);
 	}
 
 	@Override
