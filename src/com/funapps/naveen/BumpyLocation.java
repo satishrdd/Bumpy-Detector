@@ -2,7 +2,6 @@ package com.funapps.naveen;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -13,6 +12,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.text.format.Time;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,20 +20,15 @@ import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.PolylineOptions;
 
 public class BumpyLocation extends FragmentActivity implements
 		LocationListener, SensorEventListener {
 	TextView x_acc, y_acc, z_acc;
 	LocationService locationService;
+	Time time;
 	// GoogleMap googleMap;
-	LatLng latlong, prevlatlong = null;
+	LatLng latlong;
 	private float mLastX, mLastY, mLastZ;
 	private boolean mInitialized;
 	private SensorManager mSensorManager;
@@ -81,58 +76,6 @@ public class BumpyLocation extends FragmentActivity implements
 		}
 
 		locationManager.requestLocationUpdates(bestProvider, 5000, 0, this);
-
-		// gps = (Button) findViewById(R.id.btgps);
-		// nwt = (Button) findViewById(R.id.btnwt);
-
-		// gps.setOnClickListener(new OnClickListener() {
-		//
-		// @Override
-		// public void onClick(View v) {
-		// // TODO Auto-generated method stub
-		// Location location = fusedLocationService.getLocation();
-		// String locationResult = "";
-		// if (null != location) {
-		// Log.i("TAG", location.toString());
-		// double latitude = location.getLatitude();
-		// double longitude = location.getLongitude();
-		// float accuracy = location.getAccuracy();
-		// double elapsedTimeSecs = (double) location
-		// .getElapsedRealtimeNanos() / 1000000000.0;
-		// String provider = location.getProvider();
-		// double altitude = location.getAltitude();
-		// locationResult = "Latitude: " + latitude + "\n"
-		// + "Longitude: " + longitude + "\n" + "Altitude: "
-		// + altitude + "\n" + "Accuracy: " + accuracy + "\n"
-		// + "Elapsed Time: " + elapsedTimeSecs + " secs"
-		// + "\n" + "Provider: " + provider + "\n";
-		// } else {
-		// locationResult = "Location Not Available!";
-		// }
-		// tvLocation.setText(locationResult);
-		// }
-		// });
-
-		// nwt.setOnClickListener(new OnClickListener() {
-		//
-		// @Override
-		// public void onClick(View v) {
-		// // TODO Auto-generated method stub
-		// Location nwtLocation = locationService
-		// .getLocation(LocationManager.NETWORK_PROVIDER);
-		// if (nwtLocation != null) {
-		// double latitude = nwtLocation.getLatitude();
-		// double longitude = nwtLocation.getLongitude();
-		// Toast.makeText(
-		// getApplicationContext(),
-		// "Mobile Location (NW): \nLatitude: " + latitude
-		// + "\nLongitude: " + longitude,
-		// Toast.LENGTH_LONG).show();
-		// } else {
-		// showSettingsAlert("NETWORK");
-		// }
-		// }
-		// });
 	}
 
 	private boolean isGooglePlayServicesAvailable() {
@@ -163,34 +106,6 @@ public class BumpyLocation extends FragmentActivity implements
 		}
 		return super.onOptionsItemSelected(item);
 	}
-
-	// public void showSettingsAlert(String provider) {
-	// AlertDialog.Builder alertDialog = new AlertDialog.Builder(
-	// MainActivity.this);
-	//
-	// alertDialog.setTitle(provider + " SETTINGS");
-	//
-	// alertDialog.setMessage(provider
-	// + " is not enabled! Want to go to settings menu?");
-	//
-	// alertDialog.setPositiveButton("Settings",
-	// new DialogInterface.OnClickListener() {
-	// public void onClick(DialogInterface dialog, int which) {
-	// Intent intent = new Intent(
-	// Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-	// MainActivity.this.startActivity(intent);
-	// }
-	// });
-	//
-	// alertDialog.setNegativeButton("Cancel",
-	// new DialogInterface.OnClickListener() {
-	// public void onClick(DialogInterface dialog, int which) {
-	// dialog.cancel();
-	// }
-	// });
-	//
-	// alertDialog.show();
-	// }
 
 	@Override
 	public void onLocationChanged(Location location) {
@@ -255,7 +170,7 @@ public class BumpyLocation extends FragmentActivity implements
 			mLastY = y;
 			mLastZ = z;
 			// edited here
-			if (deltaZ > 10) {
+			if (deltaZ > 1) {
 				// CircleOptions circleOptions = new CircleOptions();
 				// circleOptions.center(latlong);
 				// circleOptions.radius(5);
@@ -266,12 +181,32 @@ public class BumpyLocation extends FragmentActivity implements
 				// if (prevlatlong != null && latlong != prevlatlong)
 				// googleMap.addPolyline(new PolylineOptions().add(latlong,
 				// prevlatlong));
-
-				if (prevlatlong != null && latlong != prevlatlong) {
-					String write = latlong.latitude + " " + latlong.longitude;
-					fileOperations.write(filename, write);
+				Time time = new Time(Time.getCurrentTimezone());
+				time.setToNow();
+				String write = latlong.latitude + " " + latlong.longitude+" "+time.monthDay+"/"+time.month+1+"/"+time.year+" "+time.format("%k:%M:%S");
+				if(deltaZ>1&deltaZ<5){
+					write = "1 "+write;
 				}
-				prevlatlong = latlong;
+				else if(deltaZ>=5&deltaZ<10){
+					write = "2 "+write;
+				}
+				else if(deltaZ>=10&deltaZ<20){
+					write = "3 "+write;
+				}
+				else if(deltaZ>=20&deltaZ<30){
+					write = "4 "+write;
+				}
+				else if(deltaZ>=30&deltaZ<40){
+					write = "5 "+write;
+				}
+				else if(deltaZ>=40&deltaZ<50){
+					write = "6 "+write;
+				}
+				else{
+					write = "7 "+write;
+				}
+				
+				fileOperations.write(filename, write);
 				x_acc.setText(x_acc.getText().toString() + "\n"
 						+ Float.toString(deltaX));
 				y_acc.setText(y_acc.getText().toString() + "\n"
@@ -293,14 +228,14 @@ public class BumpyLocation extends FragmentActivity implements
 
 	protected void onResume() {
 		super.onResume();
-	//	mSensorManager.registerListener(this, mAccelerometer,
-	//			SensorManager.SENSOR_DELAY_NORMAL);
+		// mSensorManager.registerListener(this, mAccelerometer,
+		// SensorManager.SENSOR_DELAY_NORMAL);
 	}
 
 	protected void onPause() {
 		super.onPause();
 		Log.d("Paused", "event paused");
-	//	mSensorManager.unregisterListener(this);
+		// mSensorManager.unregisterListener(this);
 	}
 
 	@Override
