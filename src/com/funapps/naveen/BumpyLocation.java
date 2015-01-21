@@ -1,7 +1,10 @@
 package com.funapps.naveen;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -11,6 +14,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v4.app.FragmentActivity;
 import android.text.format.Time;
 import android.util.Log;
@@ -25,16 +29,17 @@ import com.google.android.gms.maps.model.LatLng;
 public class BumpyLocation extends FragmentActivity implements
 		LocationListener, SensorEventListener {
 	TextView x_acc, y_acc, z_acc;
-	LocationService locationService;
+	LocationManager locationManager;
+	Location location;
 	Time time;
-	// GoogleMap googleMap;
 	LatLng latlong;
 	private float mLastX, mLastY, mLastZ;
 	private boolean mInitialized;
 	private SensorManager mSensorManager;
 	private Sensor mAccelerometer;
 	FileOperations fileOperations;
-	final String filename = "location";
+	String filename,bestProvider = "LocationManager.GPS_PROVIDER";
+	Criteria criteria;
 	private final float NOISE = (float) 2.0;
 
 	@SuppressLint("NewApi")
@@ -54,28 +59,78 @@ public class BumpyLocation extends FragmentActivity implements
 		y_acc.setText("");
 		z_acc.setText("");
 		mInitialized = false;
+		criteria = new Criteria();
+		// SupportMapFragment supportMapFragment = (SupportMapFragment)
+		// getSupportFragmentManager()
+		// .findFragmentById(R.id.googleMap);
+		// googleMap = supportMapFragment.getMap();
+		// googleMap.setMyLocationEnabled(true);
+		locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+
+		if (!locationManager.isProviderEnabled(bestProvider));
+			showSettingsAlert("GPS");
+		Log.d("cameback", "working");
+		time = new Time(Time.getCurrentTimezone());
+		time.setToNow();
+
+		filename = time.format("%k" + "%M" + "%S") + "" + time.monthDay
+				+ +(time.month + 1) + time.year;
+
 		mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 		mAccelerometer = mSensorManager
 				.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 		mSensorManager.registerListener(this, mAccelerometer,
 				SensorManager.SENSOR_DELAY_NORMAL);
 
-		// SupportMapFragment supportMapFragment = (SupportMapFragment)
-		// getSupportFragmentManager()
-		// .findFragmentById(R.id.googleMap);
-		// googleMap = supportMapFragment.getMap();
-		// googleMap.setMyLocationEnabled(true);
-
-		LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-		Criteria criteria = new Criteria();
-		String bestProvider = locationManager.getBestProvider(criteria, true);
-
-		Location location = locationManager.getLastKnownLocation(bestProvider);
+		
+		
+		location = locationManager
+				.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 		if (location != null) {
 			onLocationChanged(location);
 		}
+		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+				5000, 0, this);
+	}
 
-		locationManager.requestLocationUpdates(bestProvider, 5000, 0, this);
+	public Location getLocation(String provider) {
+		if (locationManager.isProviderEnabled(provider)) {
+			locationManager.requestLocationUpdates(provider, 2000, 0, this);
+			if (locationManager != null) {
+				location = locationManager.getLastKnownLocation(provider);
+				return location;
+			}
+		}
+
+		return null;
+	}
+
+	public void showSettingsAlert(String provider) {
+		AlertDialog.Builder alertDialog = new AlertDialog.Builder(
+				BumpyLocation.this);
+		alertDialog.setTitle(provider + " SETTINGS");
+
+		alertDialog.setMessage(provider
+				+ " is not enabled! Want to go to settings menu?");
+
+		alertDialog.setPositiveButton("Settings",
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						Intent intent = new Intent(
+								Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+						BumpyLocation.this.startActivity(intent);
+					}
+				});
+
+		alertDialog.setNegativeButton("Cancel",
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.cancel();
+						finish();
+					}
+				});
+
+		alertDialog.show();
 	}
 
 	private boolean isGooglePlayServicesAvailable() {
@@ -108,41 +163,6 @@ public class BumpyLocation extends FragmentActivity implements
 	}
 
 	@Override
-	public void onLocationChanged(Location location) {
-		// TODO Auto-generated method stub
-		double latitude = location.getLatitude();
-		double longitude = location.getLongitude();
-
-		latlong = new LatLng(latitude, longitude);
-
-		// googleMap.addMarker(new MarkerOptions().position(latlong));
-		// googleMap.moveCamera(CameraUpdateFactory.newLatLng(latlong));
-		// googleMap.animateCamera(CameraUpdateFactory.zoomTo(15));
-		// tvLocation.setText("Latitude: " + latitude + "\n" + "Longitude: "
-		// + longitude);
-		//
-
-	}
-
-	@Override
-	public void onStatusChanged(String provider, int status, Bundle extras) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void onProviderEnabled(String provider) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void onProviderDisabled(String provider) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	public void onSensorChanged(SensorEvent event) {
 		// TODO Auto-generated method stub
 		float x = event.values[0];
@@ -171,76 +191,71 @@ public class BumpyLocation extends FragmentActivity implements
 			mLastZ = z;
 			// edited here
 			if (deltaZ > 1) {
-				// CircleOptions circleOptions = new CircleOptions();
-				// circleOptions.center(latlong);
-				// circleOptions.radius(5);
-				// circleOptions.strokeColor(Color.YELLOW);
-				// circleOptions.strokeWidth(5);
-				// circleOptions.fillColor(Color.GREEN);
-				// googleMap.addCircle(circleOptions);
-				// if (prevlatlong != null && latlong != prevlatlong)
-				// googleMap.addPolyline(new PolylineOptions().add(latlong,
-				// prevlatlong));
-				Time time = new Time(Time.getCurrentTimezone());
-				time.setToNow();
-				String write = latlong.latitude + " " + latlong.longitude+" "+time.monthDay+"/"+time.month+1+"/"+time.year+" "+time.format("%k:%M:%S");
-				if(deltaZ>1&deltaZ<5){
-					write = "1 "+write;
-				}
-				else if(deltaZ>=5&deltaZ<10){
-					write = "2 "+write;
-				}
-				else if(deltaZ>=10&deltaZ<20){
-					write = "3 "+write;
-				}
-				else if(deltaZ>=20&deltaZ<30){
-					write = "4 "+write;
-				}
-				else if(deltaZ>=30&deltaZ<40){
-					write = "5 "+write;
-				}
-				else if(deltaZ>=40&deltaZ<50){
-					write = "6 "+write;
-				}
-				else{
-					write = "7 "+write;
-				}
-				
-				fileOperations.write(filename, write);
-				x_acc.setText(x_acc.getText().toString() + "\n"
-						+ Float.toString(deltaX));
-				y_acc.setText(y_acc.getText().toString() + "\n"
-						+ Float.toString(deltaY));
-				z_acc.setText(z_acc.getText().toString() + "\n"
-						+ Float.toString(deltaZ));
-			}
 
-			// iv.setVisibility(View.VISIBLE);
-			if (deltaX > deltaY) {
-				// iv.setImageResource(R.drawable.horizontal);
-			} else if (deltaY > deltaX) {
-				// iv.setImageResource(R.drawable.vertical);
-			} else {
-				// iv.setVisibility(View.INVISIBLE);
+				time.setToNow();
+				if (location == null)
+					location = locationManager
+							.getLastKnownLocation(bestProvider);
+				if (location != null) {
+
+					latlong = new LatLng(location.getLatitude(),
+							location.getLongitude());
+					String write = time.monthDay + "/" + (time.month + 1) + "/"
+							+ time.year + " " + time.format("%k:%M:%S") + " "
+							+ latlong.latitude + " " + latlong.longitude + " "
+							+ deltaZ;
+					fileOperations.write(filename, write);
+					x_acc.setText(x_acc.getText().toString() + "\n"
+							+ Float.toString(deltaX));
+					y_acc.setText(y_acc.getText().toString() + "\n"
+							+ Float.toString(deltaY));
+					z_acc.setText(z_acc.getText().toString() + "\n"
+							+ Float.toString(deltaZ));
+				}
 			}
 		}
-	}
-
-	protected void onResume() {
-		super.onResume();
-		// mSensorManager.registerListener(this, mAccelerometer,
-		// SensorManager.SENSOR_DELAY_NORMAL);
-	}
-
-	protected void onPause() {
-		super.onPause();
-		Log.d("Paused", "event paused");
-		// mSensorManager.unregisterListener(this);
 	}
 
 	@Override
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
 		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void onLocationChanged(Location location) {
+		// TODO Auto-generated method stub
+		this.location = location;
+	}
+
+	@Override
+	public void onStatusChanged(String provider, int status, Bundle extras) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void onProviderEnabled(String provider) {
+		// TODO Auto-generated method stub
+		Log.d("Provider","enabled");
+		bestProvider = "LocationManager.GPS_PROVIDER";
+		location = locationManager
+				.getLastKnownLocation(bestProvider);
+	}
+
+	@Override
+	public void onProviderDisabled(String provider) {
+		// TODO Auto-generated method stub
+		showSettingsAlert("GPS");
+		Log.d("Provider", "disabled");
+		bestProvider = locationManager.getBestProvider(criteria, true);
+	}
+
+	@Override
+	protected void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+		Log.d("Resume", "resemed");
 
 	}
 

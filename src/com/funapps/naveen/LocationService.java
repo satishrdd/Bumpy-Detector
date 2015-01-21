@@ -13,8 +13,8 @@ public class LocationService extends Service implements LocationListener {
 
 	protected LocationManager locationManager;
 	Location location;
-	private static final long MIN_DISTANCE_FOR_UPDATE = 10;
-	private static final long MIN_TIME_FOR_UPDATE = 1000 * 60 * 2;
+	private static final long MIN_DISTANCE_FOR_UPDATE = 0;
+	private static final long MIN_TIME_FOR_UPDATE = 1000 * 5;
 
 	public LocationService(Context c) {
 		// TODO Auto-generated constructor stub
@@ -37,7 +37,7 @@ public class LocationService extends Service implements LocationListener {
 	@Override
 	public void onLocationChanged(Location location) {
 		// TODO Auto-generated method stub
-
+		this.location = location;
 	}
 
 	@Override

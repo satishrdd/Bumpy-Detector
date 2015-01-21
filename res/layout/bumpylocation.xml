@@ -22,11 +22,13 @@
 
             <TextView
                 android:id="@+id/y_acc"
+                android:layout_marginLeft="5dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="TextView" />
             <TextView
                 android:id="@+id/z_acc"
+                android:layout_marginLeft="5dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="TextView" />
