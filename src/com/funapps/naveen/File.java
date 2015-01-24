@@ -23,7 +23,7 @@ public class File extends Activity{
 		tvout = (TextView) findViewById(R.id.fileoutput);
 		etwrite = (EditText) findViewById(R.id.write);
 		final String filename = "file";
-		foperations = new FileOperations();
+		foperations = new FileOperations(this);
 		fwrite.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
