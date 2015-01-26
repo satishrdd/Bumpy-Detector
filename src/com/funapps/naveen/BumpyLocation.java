@@ -69,11 +69,11 @@ public class BumpyLocation extends FragmentActivity implements
 		if (!isGooglePlayServicesAvailable()) {
 			finish();
 		}
+
 		setContentView(R.layout.bumpylocation);
 		fileOperations = new FileOperations(this);
 		// tvLocation = (TextView) findViewById(R.id.tvLocation);
 		x_acc = (TextView) findViewById(R.id.x_acc);
-		ScrollView scroll = (ScrollView) findViewById(R.id.scroll);
 		y_acc = (TextView) findViewById(R.id.y_acc);
 		z_acc = (TextView) findViewById(R.id.z_acc);
 		upload = (Button) findViewById(R.id.upload);
@@ -82,9 +82,7 @@ public class BumpyLocation extends FragmentActivity implements
 		z_acc.setText("");
 		mInitialized = false;
 		criteria = new Criteria();
-		connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-		info = connectivityManager.getActiveNetworkInfo();
-		isConnected = info.isConnected();
+
 		// SupportMapFragment supportMapFragment = (SupportMapFragment)
 		// getSupportFragmentManager()
 		// .findFragmentById(R.id.googleMap);
@@ -92,10 +90,16 @@ public class BumpyLocation extends FragmentActivity implements
 		// googleMap.setMyLocationEnabled(true);
 		locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
-		if (!locationManager.isProviderEnabled(bestProvider)) {
-			showSettingsAlert("GPS");
-			Log.d("cameback", "working");
+		try {
+			Thread.sleep(10000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+//		if (!locationManager.isProviderEnabled(bestProvider)) {
+//			showSettingsAlert("GPS");
+//			Log.d("cameback", "working");
+//		}
 		time = new Time(Time.getCurrentTimezone());
 		time.setToNow();
 
@@ -121,8 +125,15 @@ public class BumpyLocation extends FragmentActivity implements
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				Senddatafromfile file = new Senddatafromfile(defaultfile,
-						"http://192.168.3.196/location.php");
+				connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+				info = connectivityManager.getActiveNetworkInfo();
+				if (info == null) {
+					showNetworks();
+				} else {
+
+					Senddatafromfile file = new Senddatafromfile(defaultfile,
+							"http://192.168.3.196/location.php");
+				}
 			}
 		});
 	}
@@ -152,7 +163,7 @@ public class BumpyLocation extends FragmentActivity implements
 					public void onClick(DialogInterface dialog, int which) {
 						Intent intent = new Intent(
 								Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-						
+
 						BumpyLocation.this.startActivity(intent);
 					}
 				});
@@ -166,6 +177,31 @@ public class BumpyLocation extends FragmentActivity implements
 				});
 
 		alertDialog.show();
+	}
+
+	public void showNetworks() {
+		AlertDialog.Builder alertDialog = new AlertDialog.Builder(
+				BumpyLocation.this);
+		alertDialog.setTitle("No Internet");
+
+		alertDialog.setMessage("No Internet Connection Available.");
+
+		alertDialog.setPositiveButton("Try Later",
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				});
+
+		alertDialog.setNegativeButton("Cancel",
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.cancel();
+					}
+				});
+
+		alertDialog.show();
+
 	}
 
 	private boolean isGooglePlayServicesAvailable() {
@@ -298,7 +334,7 @@ public class BumpyLocation extends FragmentActivity implements
 	@Override
 	public void onProviderDisabled(String provider) {
 		// TODO Auto-generated method stub
-		// showSettingsAlert("GPS");
+		 showSettingsAlert("GPS");
 		// Log.d("Provider", "disabled");
 		bestProvider = locationManager.getBestProvider(criteria, true);
 	}
@@ -307,6 +343,7 @@ public class BumpyLocation extends FragmentActivity implements
 	protected void onResume() {
 		// TODO Auto-generated method stub
 		super.onResume();
+
 		Log.d("Resume", "resemed");
 
 	}
@@ -339,7 +376,7 @@ public class BumpyLocation extends FragmentActivity implements
 
 				try {
 					filenames = file.split("\n");
-					
+
 				} catch (Exception e) {
 					Log.d("Can't open default file", "");
 				}
@@ -352,7 +389,7 @@ public class BumpyLocation extends FragmentActivity implements
 				JSONParse jparse = new JSONParse();
 				for (i = 0; i < filenames.length; i++) {
 					String file = fileOperations.read(filenames[i]);
-					Log.d("filenames",filenames[i]);
+					Log.d("filenames", filenames[i]);
 					try {
 						content = file.split("\n");
 						for (int j = 0; j < content.length; j++) {
@@ -366,18 +403,18 @@ public class BumpyLocation extends FragmentActivity implements
 							list.add(new BasicNameValuePair("y_acc", b[5]));
 							list.add(new BasicNameValuePair("z_acc", b[6]));
 							jparse.makeHttpRequest(url, "POST", list);
-							
+
 						}
 						result = true;
 
 					} catch (Exception e) {
-						
+
 						result = false;
-						
+
 					}
-					
+
 				}
-				
+
 				return null;
 
 			}
@@ -392,16 +429,16 @@ public class BumpyLocation extends FragmentActivity implements
 						fileOperations.write(defaultfile,
 								filenames[filenames.length - 1]);
 					} catch (Exception e) {
-						Log.d("defaultfile","error");
+						Log.d("defaultfile", "error");
 					}
 					Toast.makeText(BumpyLocation.this, "Upload Success",
-							Toast.LENGTH_LONG).show();
+							Toast.LENGTH_SHORT).show();
 					x_acc.setText("");
 					y_acc.setText("");
 					z_acc.setText("");
 				} else {
 					Toast.makeText(BumpyLocation.this, "Upload Failed",
-							Toast.LENGTH_LONG).show();
+							Toast.LENGTH_SHORT).show();
 				}
 				mSensorManager.registerListener(BumpyLocation.this,
 						mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);

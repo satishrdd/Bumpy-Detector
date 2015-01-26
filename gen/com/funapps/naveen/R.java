@@ -2013,8 +2013,11 @@ containing a value of this type.
         public static final int ic_plusone_small_off_client=0x7f02004f;
         public static final int ic_plusone_standard_off_client=0x7f020050;
         public static final int ic_plusone_tall_off_client=0x7f020051;
-        public static final int powered_by_google_dark=0x7f020052;
-        public static final int powered_by_google_light=0x7f020053;
+        public static final int icbumpdetector=0x7f020052;
+        public static final int ivstartscreen=0x7f020053;
+        public static final int powered_by_google_dark=0x7f020054;
+        public static final int powered_by_google_light=0x7f020055;
+        public static final int wallpaper=0x7f020056;
     }
     public static final class id {
         public static final int action_bar=0x7f0b0042;
@@ -2030,13 +2033,11 @@ containing a value of this type.
         public static final int action_mode_bar=0x7f0b003f;
         public static final int action_mode_bar_stub=0x7f0b003e;
         public static final int action_mode_close_button=0x7f0b0031;
-        public static final int action_settings=0x7f0b005f;
+        public static final int action_settings=0x7f0b0056;
         public static final int activity_chooser_view_content=0x7f0b0032;
         public static final int always=0x7f0b0025;
         public static final int beginning=0x7f0b002c;
         public static final int book_now=0x7f0b0017;
-        public static final int btfout=0x7f0b0059;
-        public static final int btwrite=0x7f0b005b;
         public static final int buyButton=0x7f0b0013;
         public static final int buy_now=0x7f0b0018;
         public static final int buy_with_google=0x7f0b0019;
@@ -2052,8 +2053,6 @@ containing a value of this type.
         public static final int end=0x7f0b002d;
         public static final int expand_activities_button=0x7f0b0033;
         public static final int expanded_menu=0x7f0b0039;
-        public static final int fileoutput=0x7f0b0058;
-        public static final int googleMap=0x7f0b0050;
         public static final int grayscale=0x7f0b001b;
         public static final int holo_dark=0x7f0b000e;
         public static final int holo_light=0x7f0b000f;
@@ -2077,7 +2076,7 @@ containing a value of this type.
         public static final int radio=0x7f0b003c;
         public static final int sandbox=0x7f0b0011;
         public static final int satellite=0x7f0b000c;
-        public static final int scroll=0x7f0b0053;
+        public static final int scroll=0x7f0b0051;
         public static final int search_badge=0x7f0b0046;
         public static final int search_bar=0x7f0b0045;
         public static final int search_button=0x7f0b0047;
@@ -2099,20 +2098,15 @@ containing a value of this type.
         public static final int tabMode=0x7f0b001e;
         public static final int terrain=0x7f0b000d;
         public static final int title=0x7f0b0038;
-        public static final int tvLocation=0x7f0b0051;
-        public static final int tvacceleration=0x7f0b0052;
+        public static final int tvacceleration=0x7f0b0050;
         public static final int up=0x7f0b0001;
-        public static final int upload=0x7f0b0054;
+        public static final int upload=0x7f0b0052;
         public static final int useLogo=0x7f0b0024;
         public static final int withText=0x7f0b0029;
         public static final int wrap_content=0x7f0b0016;
-        public static final int write=0x7f0b005a;
-        public static final int x_acc=0x7f0b0055;
-        public static final int x_axis=0x7f0b005c;
-        public static final int y_acc=0x7f0b0056;
-        public static final int y_axis=0x7f0b005d;
-        public static final int z_acc=0x7f0b0057;
-        public static final int z_axis=0x7f0b005e;
+        public static final int x_acc=0x7f0b0053;
+        public static final int y_acc=0x7f0b0054;
+        public static final int z_acc=0x7f0b0055;
     }
     public static final class integer {
         /**  The maximum number of action buttons that should be permitted within
@@ -2164,11 +2158,8 @@ containing a value of this type.
         public static final int abc_search_dropdown_item_icons_2line=0x7f030014;
         public static final int abc_search_view=0x7f030015;
         public static final int abc_simple_dropdown_hint=0x7f030016;
-        public static final int activity_main=0x7f030017;
-        public static final int bumpylocation=0x7f030018;
-        public static final int file=0x7f030019;
-        public static final int sensor=0x7f03001a;
-        public static final int support_simple_spinner_dropdown_item=0x7f03001b;
+        public static final int bumpylocation=0x7f030017;
+        public static final int support_simple_spinner_dropdown_item=0x7f030018;
     }
     public static final class menu {
         public static final int main=0x7f0c0000;
