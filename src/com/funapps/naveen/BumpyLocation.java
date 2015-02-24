@@ -32,7 +32,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -83,11 +82,6 @@ public class BumpyLocation extends FragmentActivity implements
 		mInitialized = false;
 		criteria = new Criteria();
 
-		// SupportMapFragment supportMapFragment = (SupportMapFragment)
-		// getSupportFragmentManager()
-		// .findFragmentById(R.id.googleMap);
-		// googleMap = supportMapFragment.getMap();
-		// googleMap.setMyLocationEnabled(true);
 		locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
 		try {
@@ -96,10 +90,6 @@ public class BumpyLocation extends FragmentActivity implements
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-//		if (!locationManager.isProviderEnabled(bestProvider)) {
-//			showSettingsAlert("GPS");
-//			Log.d("cameback", "working");
-//		}
 		time = new Time(Time.getCurrentTimezone());
 		time.setToNow();
 
@@ -131,24 +121,12 @@ public class BumpyLocation extends FragmentActivity implements
 					showNetworks();
 				} else {
 
-					Senddatafromfile file = new Senddatafromfile(defaultfile,
-							"http://192.168.3.196/location.php");
+					new Senddatafromfile(defaultfile,
+							"http://192.168.3.196/newplottedmap.php");
 				}
 			}
 		});
 	}
-
-	// public Location getLocation(String provider) {
-	// if (locationManager.isProviderEnabled(provider)) {
-	// locationManager.requestLocationUpdates(provider, 2000, 0, this);
-	// if (locationManager != null) {
-	// location = locationManager.getLastKnownLocation(provider);
-	// return location;
-	// }
-	// }
-	//
-	// return null;
-	// }
 
 	public void showSettingsAlert(String provider) {
 		AlertDialog.Builder alertDialog = new AlertDialog.Builder(
@@ -244,9 +222,6 @@ public class BumpyLocation extends FragmentActivity implements
 			mLastX = x;
 			mLastY = y;
 			mLastZ = z;
-			// tvX.setText("0.0");
-			// tvY.setText("0.0");
-			// tvZ.setText("0.0");
 			mInitialized = true;
 			fileOperations.write(defaultfile, filename);
 		} else {
@@ -262,7 +237,6 @@ public class BumpyLocation extends FragmentActivity implements
 			mLastX = x;
 			mLastY = y;
 			mLastZ = z;
-			// edited here
 			if (deltaZ > 1) {
 
 				time.setToNow();
@@ -277,23 +251,8 @@ public class BumpyLocation extends FragmentActivity implements
 							+ time.year + " " + time.format("%k:%M:%S") + " "
 							+ latlong.latitude + " " + latlong.longitude + " "
 							+ deltaX + " " + deltaY + " " + deltaZ;
-					// if(!isConnected){
 					fileOperations.write(filename, write);
-					// }
-					// else{
-					// List<NameValuePair> list= new ArrayList<NameValuePair>();
-					// String b[]=write.split(" ");
-					// list.add(new BasicNameValuePair("date",b[0]));
-					// list.add(new BasicNameValuePair("time", b[1]));
-					// list.add(new BasicNameValuePair("latitude", b[2]));
-					// list.add(new BasicNameValuePair("longitude", b[3]));
-					// list.add(new BasicNameValuePair("x_acc", b[4]));
-					// list.add(new BasicNameValuePair("y_acc", b[5]));
-					// list.add(new BasicNameValuePair("z_acc",b[6]));
-					// SendData senddata = new
-					// SendData("http://192.168.3.196/location.php",list );
-					// senddata.execute();
-					// }
+
 					x_acc.setText(x_acc.getText().toString() + "\n"
 							+ Float.toString(deltaX));
 					y_acc.setText(y_acc.getText().toString() + "\n"
@@ -334,7 +293,7 @@ public class BumpyLocation extends FragmentActivity implements
 	@Override
 	public void onProviderDisabled(String provider) {
 		// TODO Auto-generated method stub
-		 showSettingsAlert("GPS");
+		showSettingsAlert("GPS");
 		// Log.d("Provider", "disabled");
 		bestProvider = locationManager.getBestProvider(criteria, true);
 	}
@@ -392,16 +351,23 @@ public class BumpyLocation extends FragmentActivity implements
 					Log.d("filenames", filenames[i]);
 					try {
 						content = file.split("\n");
+						List<NameValuePair> list;
 						for (int j = 0; j < content.length; j++) {
 							String b[] = content[j].split(" ");
-							List<NameValuePair> list = new ArrayList<NameValuePair>();
+							list = new ArrayList<NameValuePair>();
 							list.add(new BasicNameValuePair("date", b[0]));
 							list.add(new BasicNameValuePair("time", b[1]));
 							list.add(new BasicNameValuePair("latitude", b[2]));
 							list.add(new BasicNameValuePair("longitude", b[3]));
-							list.add(new BasicNameValuePair("x_acc", b[4]));
-							list.add(new BasicNameValuePair("y_acc", b[5]));
-							list.add(new BasicNameValuePair("z_acc", b[6]));
+							if (b.length == 7) {
+								list.add(new BasicNameValuePair("x_acc", b[4]));
+								list.add(new BasicNameValuePair("y_acc", b[5]));
+								list.add(new BasicNameValuePair("z_acc", b[6]));
+							} else {
+								list.add(new BasicNameValuePair("x_acc", "0"));
+								list.add(new BasicNameValuePair("y_acc", "0"));
+								list.add(new BasicNameValuePair("z_acc", b[4]));
+							}
 							jparse.makeHttpRequest(url, "POST", list);
 
 						}
