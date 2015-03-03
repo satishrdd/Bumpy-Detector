@@ -340,7 +340,7 @@ int id action_context_bar 0x7f09002f
 int id action_menu_divider 0x7f090002
 int id action_menu_presenter 0x7f090003
 int id action_mode_close_button 0x7f090036
-int id action_settings 0x7f090058
+int id action_settings 0x7f09005a
 int id activity_chooser_view_content 0x7f090037
 int id always 0x7f09000f
 int id beginning 0x7f090016
@@ -351,7 +351,6 @@ int id buy_with_google 0x7f090028
 int id checkbox 0x7f09003f
 int id classic 0x7f090029
 int id collapseActionView 0x7f090010
-int id curloctaion 0x7f090055
 int id default_activity_button 0x7f09003a
 int id dialog 0x7f090014
 int id disableHome 0x7f090009
@@ -360,6 +359,7 @@ int id edit_query 0x7f090042
 int id end 0x7f090017
 int id expand_activities_button 0x7f090038
 int id expanded_menu 0x7f09003e
+int id googleMap 0x7f090059
 int id grayscale 0x7f09002a
 int id holo_dark 0x7f09001d
 int id holo_light 0x7f09001e
@@ -369,6 +369,7 @@ int id hybrid 0x7f09001a
 int id icon 0x7f09003c
 int id ifRoom 0x7f090011
 int id image 0x7f090039
+int id latlng 0x7f090058
 int id listMode 0x7f090006
 int id list_item 0x7f09003b
 int id match_parent 0x7f090024
@@ -400,19 +401,20 @@ int id showCustom 0x7f09000b
 int id showHome 0x7f09000c
 int id showTitle 0x7f09000d
 int id split_action_bar 0x7f090030
-int id stoprecord 0x7f090056
-int id strecord 0x7f090057
+int id start 0x7f090055
+int id stop 0x7f090056
 int id strict_sandbox 0x7f090021
 int id submit_area 0x7f09004b
 int id tabMode 0x7f090008
 int id terrain 0x7f09001c
-int id textstart 0x7f090054
 int id title 0x7f09003d
 int id top_action_bar 0x7f090032
 int id tvacceleration 0x7f09004e
+int id tvstatus 0x7f090054
 int id up 0x7f090033
 int id upload 0x7f090050
 int id useLogo 0x7f09000e
+int id view 0x7f090057
 int id withText 0x7f090013
 int id wrap_content 0x7f090025
 int id x_acc 0x7f090051

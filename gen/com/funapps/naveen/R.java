@@ -1476,7 +1476,7 @@ containing a value of this type.
         public static final int action_menu_divider=0x7f090002;
         public static final int action_menu_presenter=0x7f090003;
         public static final int action_mode_close_button=0x7f090036;
-        public static final int action_settings=0x7f090058;
+        public static final int action_settings=0x7f09005a;
         public static final int activity_chooser_view_content=0x7f090037;
         public static final int always=0x7f09000f;
         public static final int beginning=0x7f090016;
@@ -1487,7 +1487,6 @@ containing a value of this type.
         public static final int checkbox=0x7f09003f;
         public static final int classic=0x7f090029;
         public static final int collapseActionView=0x7f090010;
-        public static final int curloctaion=0x7f090055;
         public static final int default_activity_button=0x7f09003a;
         public static final int dialog=0x7f090014;
         public static final int disableHome=0x7f090009;
@@ -1496,6 +1495,7 @@ containing a value of this type.
         public static final int end=0x7f090017;
         public static final int expand_activities_button=0x7f090038;
         public static final int expanded_menu=0x7f09003e;
+        public static final int googleMap=0x7f090059;
         public static final int grayscale=0x7f09002a;
         public static final int holo_dark=0x7f09001d;
         public static final int holo_light=0x7f09001e;
@@ -1505,6 +1505,7 @@ containing a value of this type.
         public static final int icon=0x7f09003c;
         public static final int ifRoom=0x7f090011;
         public static final int image=0x7f090039;
+        public static final int latlng=0x7f090058;
         public static final int listMode=0x7f090006;
         public static final int list_item=0x7f09003b;
         public static final int match_parent=0x7f090024;
@@ -1536,19 +1537,20 @@ containing a value of this type.
         public static final int showHome=0x7f09000c;
         public static final int showTitle=0x7f09000d;
         public static final int split_action_bar=0x7f090030;
-        public static final int stoprecord=0x7f090056;
-        public static final int strecord=0x7f090057;
+        public static final int start=0x7f090055;
+        public static final int stop=0x7f090056;
         public static final int strict_sandbox=0x7f090021;
         public static final int submit_area=0x7f09004b;
         public static final int tabMode=0x7f090008;
         public static final int terrain=0x7f09001c;
-        public static final int textstart=0x7f090054;
         public static final int title=0x7f09003d;
         public static final int top_action_bar=0x7f090032;
         public static final int tvacceleration=0x7f09004e;
+        public static final int tvstatus=0x7f090054;
         public static final int up=0x7f090033;
         public static final int upload=0x7f090050;
         public static final int useLogo=0x7f09000e;
+        public static final int view=0x7f090057;
         public static final int withText=0x7f090013;
         public static final int wrap_content=0x7f090025;
         public static final int x_acc=0x7f090051;
