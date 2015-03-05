@@ -1,5 +1,8 @@
 package com.funapps.naveen;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -14,6 +17,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -56,7 +60,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 	boolean isConnected = false;
 	private final float NOISE = (float) 2.0;
 	Handler customHandler;
-	long timeinSeconds = 0L, updatedTime = 0L,starttime=0L;
+	long timeinSeconds = 0L, updatedTime = 0L, starttime = 0L;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +95,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 		stop.setOnClickListener(this);
 		btview.setOnClickListener(this);
 		upload.setOnClickListener(this);
+		
 	}
 
 	public void showSettingsAlert(String provider) {
@@ -154,6 +159,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 		btview = (Button) findViewById(R.id.view);
 		tvlocation = (TextView) findViewById(R.id.latlng);
 		tvstatus = (TextView) findViewById(R.id.tvstatus);
+		stop.setEnabled(false);
 	}
 
 	private boolean isGooglePlayServicesAvailable() {
@@ -200,13 +206,14 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 				showNetworks();
 			} else {
 
-				// new Senddatafromfile(defaultfile,
-				// "http://192.168.3.196/newplottedmap.php");
+				new Senddatafromfile(defaultfile,
+						"http://192.168.3.196/newplottedmap.php");
+
 			}
 			break;
 		case R.id.view:
-			// Intent i = new Intent("com.funapps.naveen.ViewData");
-			// startActivity(i);
+			 Intent i = new Intent("com.funapps.naveen.ViewFILES");
+			 startActivity(i);
 			break;
 		}
 
@@ -304,16 +311,86 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 		@Override
 		public void run() {
 			// TODO Auto-generated method stub
-			timeinSeconds = SystemClock.uptimeMillis()-starttime;
+			timeinSeconds = SystemClock.uptimeMillis() - starttime;
 			updatedTime = timeinSeconds;
-			long sec =  (updatedTime/1000);
-			long min =  (sec/60);
-			long hrs =  (min/60);
-			sec = sec%60;
-			tvstatus.setText(String.format("%02d", hrs)+":"+String.format("%02d", min)+":"+String.format("%02d", sec));
+			long sec = (updatedTime / 1000);
+			long min = (sec / 60);
+			long hrs = (min / 60);
+			sec = sec % 60;
+			tvstatus.setText(String.format("%02d", hrs) + ":"
+					+ String.format("%02d", min) + ":"
+					+ String.format("%02d", sec));
 			customHandler.postDelayed(this, 0);
 		}
 
 	};
+
+	public class Senddatafromfile {
+		FileOperations fileOperations;
+		String defaultname, url;
+		String filenames[];
+		String[] content;
+		int i;
+		boolean result = true;
+
+		public Senddatafromfile(String name, String url) {
+			// TODO Auto-generated constructor stub
+			this.defaultname = name;
+			this.url = url;
+			fileOperations = new FileOperations(MainActivity.this);
+			new Upload().execute();
+		}
+
+		class Upload extends AsyncTask<Void, Void, Void> {
+
+			@Override
+			protected void onPreExecute() {
+				// TODO Auto-generated method stub
+				super.onPreExecute();
+				
+				String file = fileOperations.read(defaultname);
+
+				try {
+					filenames = file.split("\n");
+
+				} catch (Exception e) {
+					Log.d("Can't open default file", "");
+				}
+			}
+
+			@Override
+			protected Void doInBackground(Void... params) {
+				// TODO Auto-generated method stub
+
+				for (i = 0; i < filenames.length; i++) {
+					try {
+					    // Set your file path here
+					    FileInputStream fstrm = new FileInputStream("/sdcard/"+filenames[i]+".txt");
+
+					    // Set your server page url (and the file title/description)
+					    FileUpload hfu = new FileUpload("http://192.168.3.196/Bumpy/uploadfile.php", filenames[i],"my file description");
+
+					    hfu.Send_Now(fstrm);
+
+					  } catch (FileNotFoundException e) {
+					    // Error: File not found
+						  Log.d("File Upload","failed");
+					  }
+
+				}
+
+				return null;
+
+			}
+
+			@Override
+			protected void onPostExecute(Void reesult) {
+				// TODO Auto-generated method stub
+				
+			}
+
+		}
+
+	}
 
 }
