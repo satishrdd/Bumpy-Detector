@@ -11,17 +11,18 @@ import android.util.Log;
 
 public class FileOperations {
 	Context c;
+
 	public FileOperations(Context c) {
 		// TODO Auto-generated constructor stub
-		this.c =c;
+		this.c = c;
 	}
 
 	public boolean write(String filename, String filecontent) {
 		try {
-			String filepath = "/sdcard/"+filename + ".txt";
+			String filepath = "/sdcard/" + filename + ".txt";
 			FileOutputStream fos = new FileOutputStream(filepath, true);
 			OutputStreamWriter osw = new OutputStreamWriter(fos);
-			osw.write(filecontent+"\n");
+			osw.write(filecontent + "\n");
 			osw.close();
 			Log.d("Success", "Success");
 
@@ -32,37 +33,25 @@ public class FileOperations {
 		return false;
 
 	}
-	public String read(String filename){
-		
+
+	public String read(String filename) {
+
 		String Response = null;
-		try{
-			String filepath = "/sdcard/"+filename+".txt";
+		try {
+			String filepath = "/sdcard/" + filename + ".txt";
 			StringBuffer sb = new StringBuffer();
 			BufferedReader br = new BufferedReader(new FileReader(filepath));
 			String line = "";
-			while((line = br.readLine())!=null){
-				sb.append(line+"\n");
+			while ((line = br.readLine()) != null) {
+				sb.append(line + "\n");
 			}
 			Response = sb.toString();
-			
-			try{
-				if(filename!="files"){
-					File file = new File(filepath);
-					boolean yes=file.delete();
-				if(yes)
-					Log.d("file","true");
-				else 
-					Log.d("file","false");
-				}
-			}catch(Exception e){
-				Log.d("file","file cannot be created");
-			}
+
 			br.close();
-		}catch(Exception e){
-			Log.d("Exception","Can't read file");
+		} catch (Exception e) {
+			Log.d("Exception", "Can't read file");
 		}
-		
-		
+
 		return Response;
 	}
 }

@@ -1,5 +1,6 @@
 package com.funapps.naveen;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import android.app.Activity;
@@ -14,6 +15,7 @@ public class ViewFiles extends Activity {
 	FileOperations fileoperations;
 	String[] filenames;
 	ArrayAdapter<String> adapter;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -22,12 +24,16 @@ public class ViewFiles extends Activity {
 		list = (ListView) findViewById(R.id.viewfilelist);
 		array = new ArrayList<String>();
 		fileoperations = new FileOperations(this);
-		String file = fileoperations.read("files");
-		filenames = file.split("\n");
-		for(int i=0;i<filenames.length;i++){
-			array.add(filenames[i]+".txt");
+		File filename = new File("/sdcard/files.txt");
+		if (filename.exists() & filename.length() != 0) {
+			String file = fileoperations.read("files");
+			filenames = file.split("\n");
+			for (int i = 0; i < filenames.length; i++) {
+				array.add(filenames[i] + ".txt");
+			}
+			adapter = new ArrayAdapter<String>(this,
+					android.R.layout.simple_list_item_multiple_choice, array);
+			list.setAdapter(adapter);
 		}
-		adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_multiple_choice,array);
-		list.setAdapter(adapter);
 	}
 }

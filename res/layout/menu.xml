@@ -17,7 +17,7 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:paddingTop="20dp"
-            android:text="Start" />
+            android:text="" />
 
         <Button
             android:id="@+id/start"
@@ -54,13 +54,15 @@
             android:paddingLeft="10dp"
             android:text="stop" />
 
-        <TextView
-            android:id="@+id/latlng"
-            android:layout_width="wrap_content"
+        
+
+        <Spinner
+            android:id="@+id/vehicletype"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:text="Location" />
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/start"
+         />
         
     </RelativeLayout>
 

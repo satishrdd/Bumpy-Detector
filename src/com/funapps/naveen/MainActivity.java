@@ -1,7 +1,12 @@
 package com.funapps.naveen;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -27,8 +32,13 @@ import android.text.format.Time;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -40,9 +50,12 @@ import com.google.android.gms.maps.model.LatLng;
 public class MainActivity extends FragmentActivity implements OnClickListener,
 		SensorEventListener, LocationListener {
 
+	Spinner vehicletype;
+	JSONArray myarray;
+	JSONObject myobject;
 	Button stop, start, upload, btview;
 	GoogleMap googlemap;
-	TextView tvlocation, tvstatus;
+	TextView tvstatus;
 	FileOperations fileoperations;
 	boolean mInitialized;
 	float mLastX, mLastY, mLastZ;
@@ -61,6 +74,8 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 	private final float NOISE = (float) 2.0;
 	Handler customHandler;
 	long timeinSeconds = 0L, updatedTime = 0L, starttime = 0L;
+	public ArrayAdapter<String> adapter;
+	private String[] type = { "Auto", "Bike", "BiCycle", "Bus", "Car", "Lorry" };
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -89,13 +104,31 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 		if (location != null) {
 			onLocationChanged(location);
 		}
-		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-				200, 0, this);
+		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,
+				0, this);
 		start.setOnClickListener(this);
 		stop.setOnClickListener(this);
 		btview.setOnClickListener(this);
 		upload.setOnClickListener(this);
-		
+		adapter = new ArrayAdapter<String>(getApplicationContext(),
+				android.R.layout.simple_spinner_item, type);
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		vehicletype.setAdapter(adapter);
+		vehicletype.setOnItemSelectedListener(new OnItemSelectedListener() {
+
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view,
+					int position, long id) {
+				// TODO Auto-generated method stub
+				vehicletype.setSelection(position);
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parent) {
+				// TODO Auto-generated method stub
+
+			}
+		});
 	}
 
 	public void showSettingsAlert(String provider) {
@@ -153,12 +186,13 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 	}
 
 	void init() {
+
 		start = (Button) findViewById(R.id.start);
 		stop = (Button) findViewById(R.id.stop);
 		upload = (Button) findViewById(R.id.upload);
 		btview = (Button) findViewById(R.id.view);
-		tvlocation = (TextView) findViewById(R.id.latlng);
 		tvstatus = (TextView) findViewById(R.id.tvstatus);
+		vehicletype = (Spinner) findViewById(R.id.vehicletype);
 		stop.setEnabled(false);
 	}
 
@@ -184,8 +218,11 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 			time = new Time(Time.getCurrentTimezone());
 			time.setToNow();
 
-			filename = time.format("%k" + "%M" + "%S") + time.monthDay
-					+ (time.month + 1) + time.year;
+			filename = time.monthDay + "" + (time.month + 1) + "" + time.year
+					+ "" + time.format("%k" + "%M" + "%S");
+			myobject = new JSONObject();
+			myarray = new JSONArray();
+
 			mSensorManager.registerListener(MainActivity.this, mAccelerometer,
 					SensorManager.SENSOR_DELAY_NORMAL);
 			starttime = SystemClock.uptimeMillis();
@@ -197,23 +234,28 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 			customHandler.removeCallbacks(updateTimerThread);
 			mSensorManager
 					.unregisterListener(MainActivity.this, mAccelerometer);
+			try {
+				myobject.put("data", myarray);
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			fileoperations.write(defaultfile, filename);
+			fileoperations.write(filename, myobject.toString());
 			break;
 		case R.id.upload:
 			upload.setEnabled(false);
-			connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-			info = connectivityManager.getActiveNetworkInfo();
-			if (info == null) {
-				showNetworks();
-			} else {
+			mSensorManager
+					.unregisterListener(MainActivity.this, mAccelerometer);
+			start.setEnabled(false);
+			customHandler.removeCallbacks(updateTimerThread);
+			new Senddatafromfile(defaultfile,
+					"http://192.168.3.196/Bumpy/uploadfile.php");
 
-				new Senddatafromfile(defaultfile,
-						"http://192.168.3.196/newplottedmap.php");
-
-			}
 			break;
 		case R.id.view:
-			 Intent i = new Intent("com.funapps.naveen.ViewFILES");
-			 startActivity(i);
+			Intent i = new Intent("com.funapps.naveen.ViewFILES");
+			startActivity(i);
 			break;
 		}
 
@@ -231,7 +273,14 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 			mLastY = y;
 			mLastZ = z;
 			mInitialized = true;
-			fileoperations.write(defaultfile, filename);
+			try {
+				myobject.put("filename", filename);
+				myobject.put("vehicletype", vehicletype.getSelectedItem());
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 		} else {
 			float deltaX = Math.abs(mLastX - x);
 			float deltaY = Math.abs(mLastY - y);
@@ -253,13 +302,38 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 							.getLastKnownLocation(bestProvider);
 				if (location != null) {
 					Log.d("provider", bestProvider);
-					latlng = new LatLng(location.getLatitude(),
-							location.getLongitude());
-					String write = time.monthDay + "/" + (time.month + 1) + "/"
-							+ time.year + " " + time.format("%k:%M:%S") + " "
-							+ latlng.latitude + " " + latlng.longitude + " "
-							+ deltaX + " " + deltaY + " " + deltaZ;
-					fileoperations.write(filename, write);
+					int tempmonth = time.month + 1;
+					int tempday = time.monthDay;
+					int year = time.year;
+					String month = tempmonth + "";
+					String day = tempday + "";
+					if (tempmonth < 10)
+						month = "0" + tempmonth;
+					if (tempday < 10)
+						day = "0" + tempday;
+					String timer = time.format("%k:%M:%S");
+					JSONObject tempobj = new JSONObject();
+					try {
+						tempobj.put("time", timer);
+						tempobj.put("date", day+"-"+month+"-"+year);
+						tempobj.put("latitude", location.getLatitude());
+						tempobj.put("longitude", location.getLongitude());
+						tempobj.put("xacc", deltaX);
+						tempobj.put("yacc", deltaY);
+						tempobj.put("zacc", deltaZ);
+						tempobj.put("speed", location.getSpeed());
+						myarray.put(tempobj);
+					} catch (JSONException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+//					String write = time.monthDay + "/" + (time.month + 1) + "/"
+//							+ time.year + " " + time.format("%k:%M:%S") + " "
+//							+ location.getLatitude() + " "
+//							+ location.getLongitude() + " " + deltaX + " "
+//							+ deltaY + " " + deltaZ + " " + location.getSpeed();
+//					fileoperations.write(filename, write);
 
 				}
 			}
@@ -276,14 +350,12 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 	public void onLocationChanged(Location location) {
 		// TODO Auto-generated method stub
 		this.location = location;
-		tvlocation = (TextView) findViewById(R.id.latlng);
 		double latitude = location.getLatitude();
 		double longitude = location.getLongitude();
 		latlng = new LatLng(latitude, longitude);
 		googlemap.moveCamera(CameraUpdateFactory.newLatLng(latlng));
 		googlemap.animateCamera(CameraUpdateFactory.zoomTo(15));
-		tvlocation.setText("Latitude: " + latitude + "\n" + "Longitude: "
-				+ longitude);
+
 	}
 
 	@Override
@@ -347,7 +419,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 			protected void onPreExecute() {
 				// TODO Auto-generated method stub
 				super.onPreExecute();
-				
+
 				String file = fileOperations.read(defaultname);
 
 				try {
@@ -355,27 +427,42 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 
 				} catch (Exception e) {
 					Log.d("Can't open default file", "");
+					filenames = null;
 				}
 			}
 
 			@Override
 			protected Void doInBackground(Void... params) {
 				// TODO Auto-generated method stub
+				i = 0;
 
-				for (i = 0; i < filenames.length; i++) {
+				while (filenames != null && i < filenames.length) {
 					try {
-					    // Set your file path here
-					    FileInputStream fstrm = new FileInputStream("/sdcard/"+filenames[i]+".txt");
+						// Set your file path here
+						connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+						info = connectivityManager.getActiveNetworkInfo();
+						if (info == null) {
 
-					    // Set your server page url (and the file title/description)
-					    FileUpload hfu = new FileUpload("http://192.168.3.196/Bumpy/uploadfile.php", filenames[i],"my file description");
+							return null;
+						} else {
+							FileInputStream fstrm = new FileInputStream(
+									"/sdcard/" + filenames[i] + ".txt");
 
-					    hfu.Send_Now(fstrm);
+							// Set your server page url (and the file
+							// title/description)
+							FileUpload hfu = new FileUpload(url, filenames[i],
+									"my file description");
 
-					  } catch (FileNotFoundException e) {
-					    // Error: File not found
-						  Log.d("File Upload","failed");
-					  }
+							hfu.Send_Now(fstrm);
+							i++;
+						}
+
+					} catch (FileNotFoundException e) {
+						// Error: File not found
+
+						Log.d("File Upload", "failed");
+
+					}
 
 				}
 
@@ -384,9 +471,22 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 			}
 
 			@Override
-			protected void onPostExecute(Void reesult) {
+			protected void onPostExecute(Void result) {
 				// TODO Auto-generated method stub
-				
+				super.onPostExecute(result);
+
+				if (filenames != null && i == filenames.length) {
+					File file = new File("/sdcard/files.txt");
+					file.delete();
+
+					Toast.makeText(getApplicationContext(), "Upload Success",
+							Toast.LENGTH_SHORT).show();
+				} else {
+					Toast.makeText(getApplicationContext(), "Upload failed",
+							Toast.LENGTH_SHORT).show();
+				}
+				upload.setEnabled(true);
+				start.setEnabled(true);
 			}
 
 		}

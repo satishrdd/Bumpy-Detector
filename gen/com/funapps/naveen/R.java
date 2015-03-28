@@ -1505,7 +1505,6 @@ containing a value of this type.
         public static final int icon=0x7f09003c;
         public static final int ifRoom=0x7f090011;
         public static final int image=0x7f090039;
-        public static final int latlng=0x7f090058;
         public static final int listMode=0x7f090006;
         public static final int list_item=0x7f09003b;
         public static final int match_parent=0x7f090024;
@@ -1550,6 +1549,7 @@ containing a value of this type.
         public static final int up=0x7f090033;
         public static final int upload=0x7f090050;
         public static final int useLogo=0x7f09000e;
+        public static final int vehicletype=0x7f090058;
         public static final int view=0x7f090057;
         public static final int viewfilelist=0x7f09005a;
         public static final int withText=0x7f090013;
