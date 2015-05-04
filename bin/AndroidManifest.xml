@@ -34,14 +34,21 @@
             android:value="AIzaSyDGxQiv9wLuNv3hLP8PLvYm82aYkh1YrLE" />
 
         <activity
-            android:name=".MainActivity"
-            android:allowBackup="true"
-            android:label="@string/app_name"
+            android:name=".Login"
             android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".MainActivity"
+            android:screenOrientation="portrait" >
+            <intent-filter>
+                <action android:name="com.funapps.naveen.MainActivity" />
+
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         <activity

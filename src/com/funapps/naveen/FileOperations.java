@@ -1,11 +1,9 @@
 package com.funapps.naveen;
 
 import java.io.BufferedReader;
-
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.OutputStreamWriter;
-import java.io.File;
 import android.content.Context;
 import android.util.Log;
 
@@ -19,7 +17,7 @@ public class FileOperations {
 
 	public boolean write(String filename, String filecontent) {
 		try {
-			String filepath = "/sdcard/" + filename + ".txt";
+			String filepath = filename;
 			FileOutputStream fos = new FileOutputStream(filepath, true);
 			OutputStreamWriter osw = new OutputStreamWriter(fos);
 			osw.write(filecontent + "\n");
@@ -38,7 +36,7 @@ public class FileOperations {
 
 		String Response = null;
 		try {
-			String filepath = "/sdcard/" + filename + ".txt";
+			String filepath = filename;
 			StringBuffer sb = new StringBuffer();
 			BufferedReader br = new BufferedReader(new FileReader(filepath));
 			String line = "";

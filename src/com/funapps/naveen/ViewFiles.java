@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Environment;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -24,9 +25,9 @@ public class ViewFiles extends Activity {
 		list = (ListView) findViewById(R.id.viewfilelist);
 		array = new ArrayList<String>();
 		fileoperations = new FileOperations(this);
-		File filename = new File("/sdcard/files.txt");
+		File filename = new File(Environment.getExternalStorageDirectory()+"/files.txt");
 		if (filename.exists() & filename.length() != 0) {
-			String file = fileoperations.read("files");
+			String file = fileoperations.read(Environment.getExternalStorageDirectory()+"/files.txt");
 			filenames = file.split("\n");
 			for (int i = 0; i < filenames.length; i++) {
 				array.add(filenames[i] + ".txt");

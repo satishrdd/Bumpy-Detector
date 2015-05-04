@@ -24,6 +24,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.provider.Settings;
@@ -60,6 +61,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 	boolean mInitialized;
 	float mLastX, mLastY, mLastZ;
 	Location location;
+	String username;
 	LocationManager locationManager;
 	String bestProvider = "LocationManager.GPS_PROVIDER", filename,
 			defaultfile = "files";
@@ -110,9 +112,9 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 		stop.setOnClickListener(this);
 		btview.setOnClickListener(this);
 		upload.setOnClickListener(this);
-		adapter = new ArrayAdapter<String>(getApplicationContext(),
-				android.R.layout.simple_spinner_item, type);
-		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		adapter = new ArrayAdapter<String>(MainActivity.this,
+				android.R.layout.simple_spinner_dropdown_item, type);
+		// adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		vehicletype.setAdapter(adapter);
 		vehicletype.setOnItemSelectedListener(new OnItemSelectedListener() {
 
@@ -194,6 +196,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 		tvstatus = (TextView) findViewById(R.id.tvstatus);
 		vehicletype = (Spinner) findViewById(R.id.vehicletype);
 		stop.setEnabled(false);
+		username = getIntent().getExtras().getString("username");
 	}
 
 	private boolean isGooglePlayServicesAvailable() {
@@ -215,9 +218,15 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 			start.setEnabled(false);
 			stop.setEnabled(true);
 			mInitialized = false;
+			try {
+				Thread.sleep(10000);
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			time = new Time(Time.getCurrentTimezone());
 			time.setToNow();
-
+			Log.d("filepath", Environment.getExternalStorageDirectory() + "");
 			filename = time.monthDay + "" + (time.month + 1) + "" + time.year
 					+ "" + time.format("%k" + "%M" + "%S");
 			myobject = new JSONObject();
@@ -226,6 +235,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 			mSensorManager.registerListener(MainActivity.this, mAccelerometer,
 					SensorManager.SENSOR_DELAY_NORMAL);
 			starttime = SystemClock.uptimeMillis();
+
 			customHandler.postDelayed(updateTimerThread, 0);
 			break;
 		case R.id.stop:
@@ -234,14 +244,21 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 			customHandler.removeCallbacks(updateTimerThread);
 			mSensorManager
 					.unregisterListener(MainActivity.this, mAccelerometer);
+			String timer = time.format("%k:%M:%S");
 			try {
+				myobject.put("stoptime", timer);
+				myobject.put("stoplatitude", location.getLatitude());
+				myobject.put("stoplongitude", location.getLongitude());
 				myobject.put("data", myarray);
+				myobject.put("username",username);
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			fileoperations.write(defaultfile, filename);
-			fileoperations.write(filename, myobject.toString());
+			fileoperations.write(Environment.getExternalStorageDirectory()
+					+ "/" + defaultfile + ".txt", filename);
+			fileoperations.write(Environment.getExternalStorageDirectory()
+					+ "/" + filename + ".txt", myobject.toString());
 			break;
 		case R.id.upload:
 			upload.setEnabled(false);
@@ -273,14 +290,18 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 			mLastY = y;
 			mLastZ = z;
 			mInitialized = true;
+			String timer = time.format("%k:%M:%S");
 			try {
 				myobject.put("filename", filename);
 				myobject.put("vehicletype", vehicletype.getSelectedItem());
+				myobject.put("starttime", timer);
+				myobject.put("startlatitude", location.getLatitude());
+				myobject.put("startlongitude", location.getLongitude());
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
+
 		} else {
 			float deltaX = Math.abs(mLastX - x);
 			float deltaY = Math.abs(mLastY - y);
@@ -315,7 +336,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 					JSONObject tempobj = new JSONObject();
 					try {
 						tempobj.put("time", timer);
-						tempobj.put("date", day+"-"+month+"-"+year);
+						tempobj.put("date", day + "-" + month + "-" + year);
 						tempobj.put("latitude", location.getLatitude());
 						tempobj.put("longitude", location.getLongitude());
 						tempobj.put("xacc", deltaX);
@@ -328,12 +349,13 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 						e.printStackTrace();
 					}
 
-//					String write = time.monthDay + "/" + (time.month + 1) + "/"
-//							+ time.year + " " + time.format("%k:%M:%S") + " "
-//							+ location.getLatitude() + " "
-//							+ location.getLongitude() + " " + deltaX + " "
-//							+ deltaY + " " + deltaZ + " " + location.getSpeed();
-//					fileoperations.write(filename, write);
+					// String write = time.monthDay + "/" + (time.month + 1) +
+					// "/"
+					// + time.year + " " + time.format("%k:%M:%S") + " "
+					// + location.getLatitude() + " "
+					// + location.getLongitude() + " " + deltaX + " "
+					// + deltaY + " " + deltaZ + " " + location.getSpeed();
+					// fileoperations.write(filename, write);
 
 				}
 			}
@@ -420,7 +442,11 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 				// TODO Auto-generated method stub
 				super.onPreExecute();
 
-				String file = fileOperations.read(defaultname);
+				String file = fileOperations.read(Environment
+						.getExternalStorageDirectory()
+						+ "/"
+						+ defaultname
+						+ ".txt");
 
 				try {
 					filenames = file.split("\n");
@@ -446,7 +472,8 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 							return null;
 						} else {
 							FileInputStream fstrm = new FileInputStream(
-									"/sdcard/" + filenames[i] + ".txt");
+									Environment.getExternalStorageDirectory()
+											+ "/" + filenames[i] + ".txt");
 
 							// Set your server page url (and the file
 							// title/description)
@@ -459,7 +486,7 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 
 					} catch (FileNotFoundException e) {
 						// Error: File not found
-
+						i++;
 						Log.d("File Upload", "failed");
 
 					}
@@ -476,7 +503,9 @@ public class MainActivity extends FragmentActivity implements OnClickListener,
 				super.onPostExecute(result);
 
 				if (filenames != null && i == filenames.length) {
-					File file = new File("/sdcard/files.txt");
+					File file = new File(
+							Environment.getExternalStorageDirectory()
+									+ "/files.txt");
 					file.delete();
 
 					Toast.makeText(getApplicationContext(), "Upload Success",
